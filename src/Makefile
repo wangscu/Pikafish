@@ -37,11 +37,17 @@ else ifeq ($(COMP),mingw)
 	endif
 endif
 
-### Executable name
+### Executable and shared library names
 ifeq ($(target_windows),yes)
 	EXE = pikafish.exe
+	SHARED_LIB = pikafish.dll
 else
 	EXE = pikafish
+	ifeq ($(KERNEL),Darwin)
+		SHARED_LIB = libpikafish.dylib
+	else
+		SHARED_LIB = libpikafish.so
+	endif
 endif
 
 ### Installation dir definitions
@@ -884,6 +890,7 @@ help:
 	echo "help                    > Display architecture details" && \
 	echo "profile-build           > standard build with profile-guided optimization" && \
 	echo "build                   > skip profile-guided optimization" && \
+	echo "shared-lib              > build as shared library (.so/.dll/.dylib)" && \
 	echo "net                     > Download the default nnue nets" && \
 	echo "strip                   > Strip executable" && \
 	echo "install                 > Install executable" && \
@@ -950,7 +957,7 @@ ifneq ($(SUPPORTED_ARCH), true)
 endif
 
 
-.PHONY: help analyze build profile-build strip install clean net \
+.PHONY: help analyze build profile-build shared-lib strip install clean net \
 	objclean profileclean config-sanity \
 	config-sanity \
 	icx-profile-use icx-profile-make \
@@ -963,6 +970,9 @@ analyze: net config-sanity objclean
 
 build: net config-sanity
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) all
+
+shared-lib: net config-sanity
+	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) CXXFLAGS="$(CXXFLAGS) -fPIC" LDFLAGS="$(LDFLAGS) -shared" $(SHARED_LIB)
 
 profile-build: net config-sanity objclean profileclean
 	@echo ""
@@ -994,7 +1004,7 @@ clean: objclean profileclean
 
 # clean binaries and objects
 objclean:
-	@rm -f pikafish pikafish.exe $(shell find . -name '*.o')
+	@rm -f pikafish pikafish.exe *.so *.dll *.dylib lib*.so lib*.dll lib*.dylib $(shell find . -name '*.o')
 
 # clean auxiliary profiling files
 profileclean:
@@ -1090,6 +1100,9 @@ config-sanity: net
 	 test "$(comp)" = "aarch64-linux-android21-clang")
 
 $(EXE): $(OBJS)
+	+$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+
+$(SHARED_LIB): $(OBJS)
 	+$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 
 %.o: %.S

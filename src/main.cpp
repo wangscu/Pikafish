@@ -24,10 +24,12 @@
 #include "position.h"
 #include "uci.h"
 #include "tune.h"
+#include "pikafish_c_api.h"
 
 using namespace Stockfish;
 
-int main(int argc, char* argv[]) {
+// Internal main function
+int pikafish_main(int argc, char* argv[]) {
 
     std::cout << engine_info() << std::endl;
 
@@ -41,4 +43,29 @@ int main(int argc, char* argv[]) {
     uci.loop();
 
     return 0;
+}
+
+// Standard main function for executable
+int main(int argc, char* argv[]) {
+    return pikafish_main(argc, argv);
+}
+
+// External C interface for shared library
+extern "C" {
+    int pikafish_engine_main(int argc, char* argv[]) {
+        return pikafish_main(argc, argv);
+    }
+
+    // Initialize the engine without starting the main loop
+    int pikafish_engine_init(void) {
+        Bitboards::init();
+        Position::init();
+        return 0;
+    }
+
+    // Get engine info as C string
+    const char* pikafish_engine_info(void) {
+        static std::string info = engine_info();
+        return info.c_str();
+    }
 }
