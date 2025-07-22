@@ -18,6 +18,8 @@
 
 #include <iostream>
 #include <string>
+#include <deque>
+#include <cstring>
 
 #include "bitboard.h"
 #include "misc.h"
@@ -52,6 +54,37 @@ int main(int argc, char* argv[]) {
     return pikafish_main(argc, argv);
 }
 
+// Stateful engine implementation
+struct EngineState {
+    Position pos;
+    std::deque<StateInfo> states;
+    std::unique_ptr<Eval::NNUE::Networks> networks;
+    std::unique_ptr<Eval::NNUE::AccumulatorStack> accumulators;
+    std::unique_ptr<Eval::NNUE::AccumulatorCaches> caches;
+    bool initialized = false;
+    
+    EngineState() : states(1) {}
+};
+
+static EngineState engine;
+
+// Initialize engine
+static void ensure_initialized() {
+    if (!engine.initialized) {
+        Bitboards::init();
+        Position::init();
+        
+        engine.networks = std::make_unique<Eval::NNUE::Networks>(
+            Eval::NNUE::NetworkBig({EvalFileDefaultNameBig, "None", ""}));
+        engine.networks->big.load(".", EvalFileDefaultNameBig);
+        
+        engine.accumulators = std::make_unique<Eval::NNUE::AccumulatorStack>();
+        engine.caches = std::make_unique<Eval::NNUE::AccumulatorCaches>(*engine.networks);
+        
+        engine.initialized = true;
+    }
+}
+
 // External C interface for shared library
 extern "C" {
     int pikafish_engine_main(int argc, char* argv[]) {
@@ -71,47 +104,72 @@ extern "C" {
         return info.c_str();
     }
 
-    // Evaluate a position from FEN string
+    // Legacy function for backward compatibility
     int pikafish_evaluate_position(const char* fen) {
-        if (!fen) {
-            std::cerr << "Invalid FEN string" << std::endl;
-            return 0;
-        }
-        std::cerr << "Valid FEN string" << fen<< std::endl;
-
-
-        // Initialize if not already done
-        static bool initialized = false;
-        if (!initialized) {
-            Bitboards::init();
-            Position::init();
-            initialized = true;
-        }
-
-        // Create position from FEN
-        Position pos;
-        StateInfo si;
-        pos.set(std::string(fen), &si);
-
-        // Initialize networks (correct approach)
-        static std::unique_ptr<Eval::NNUE::Networks> networks;
-        static bool network_loaded = false;
+        if (!fen) return 0;
         
-        if (!network_loaded) {
-            Eval::NNUE::NetworkBig network({EvalFileDefaultNameBig, "None", ""});
-            network.load(".", EvalFileDefaultNameBig);
-            networks = std::make_unique<Eval::NNUE::Networks>(std::move(network));
-            network_loaded = true;
-        }
-
-        // Create accumulator stack and caches
-        Eval::NNUE::AccumulatorStack accumulators;
-        auto caches = std::make_unique<Eval::NNUE::AccumulatorCaches>(*networks);
-
-        // Evaluate position
-        Value score = Eval::evaluate(*networks, pos, accumulators, *caches, VALUE_ZERO);
-
-        // Convert to centipawns and return
+        ensure_initialized();
+        
+        Position temp_pos;
+        StateInfo temp_si;
+        temp_pos.set(std::string(fen), &temp_si);
+        
+        Value score = Eval::evaluate(*engine.networks, temp_pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
         return static_cast<int>(score);
+    }
+
+    // Stateful engine API
+
+    // Initialize position from FEN
+    int pikafish_init_position(const char* fen) {
+        if (!fen) return -1;
+        
+        ensure_initialized();
+        
+        engine.states = std::deque<StateInfo>(1);
+        engine.pos.set(std::string(fen), &engine.states.back());
+        
+        return 0;
+    }
+
+    // Apply move and return new hash
+    uint64_t pikafish_do_move(uint16_t move) {
+        Move m(move);
+        ensure_initialized();
+
+        // Validate move is legal
+        if (!m.is_ok() || !engine.pos.legal(m)){
+            return -1;
+        }
+        
+        engine.states.emplace_back();
+        DirtyPiece dp = engine.pos.do_move(m, engine.states.back(), engine.pos.gives_check(m), nullptr);
+        engine.accumulators->push(dp); 
+       
+        return engine.pos.key();
+    }
+
+    // Evaluate current position
+    int pikafish_evaluate() {
+        ensure_initialized();
+        
+        //PikafishEvaluation result = {0, 0, ""};
+        
+        // For now, use static evaluation
+        // TODO: Implement actual search with given depth
+        Value score = Eval::evaluate(*engine.networks, engine.pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
+        return static_cast<int>(score);
+    }
+
+    // Undo last move
+    uint64_t pikafish_undo_move(uint16_t move) {
+        if (engine.states.size() <= 1) {
+            return -1;
+        }
+        Move m(move);
+
+        engine.pos.undo_move(m);
+        engine.states.pop_back();
+        return 0;
     }
 }

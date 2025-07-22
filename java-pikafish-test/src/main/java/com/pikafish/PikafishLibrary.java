@@ -48,6 +48,37 @@ public interface PikafishLibrary extends Library {
     int pikafish_evaluate_position(String fen);
 
     /**
+     * 从FEN字符串初始化棋局位置
+     *
+     * @param fen FEN字符串表示的棋局位置
+     * @return 0表示成功，非0表示失败
+     */
+    int pikafish_init_position(String fen);
+
+    /**
+     * 应用合法移动
+     *
+     * @param move 16位无符号整数表示的移动
+     * @return 新位置的哈希值，0表示失败
+     */
+    long pikafish_do_move(short move);
+
+    /**
+     * 评估当前位置
+     *
+     * @return 评估分数（以分为单位）
+     */
+    int pikafish_evaluate();
+
+    /**
+     * 撤销最后一步移动
+     *
+     * @param move 16位无符号整数表示的要撤销的移动
+     * @return 0表示成功，非0表示失败
+     */
+    long pikafish_undo_move(short move);
+
+    /**
      * 工厂类用于创建PikafishLibrary实例
      */
     class Factory {
