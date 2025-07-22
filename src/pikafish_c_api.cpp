@@ -24,6 +24,8 @@
 #include "position.h"
 #include "uci.h"
 #include "tune.h"
+#include "evaluate.h"
+#include "nnue/network.h"
 #include "pikafish_c_api.h"
 
 using namespace Stockfish;
@@ -67,5 +69,49 @@ extern "C" {
     const char* pikafish_engine_info(void) {
         static std::string info = engine_info();
         return info.c_str();
+    }
+
+    // Evaluate a position from FEN string
+    int pikafish_evaluate_position(const char* fen) {
+        if (!fen) {
+            std::cerr << "Invalid FEN string" << std::endl;
+            return 0;
+        }
+        std::cerr << "Valid FEN string" << fen<< std::endl;
+
+
+        // Initialize if not already done
+        static bool initialized = false;
+        if (!initialized) {
+            Bitboards::init();
+            Position::init();
+            initialized = true;
+        }
+
+        // Create position from FEN
+        Position pos;
+        StateInfo si;
+        pos.set(std::string(fen), &si);
+
+        // Initialize networks (correct approach)
+        static std::unique_ptr<Eval::NNUE::Networks> networks;
+        static bool network_loaded = false;
+        
+        if (!network_loaded) {
+            Eval::NNUE::NetworkBig network({EvalFileDefaultNameBig, "None", ""});
+            network.load(".", EvalFileDefaultNameBig);
+            networks = std::make_unique<Eval::NNUE::Networks>(std::move(network));
+            network_loaded = true;
+        }
+
+        // Create accumulator stack and caches
+        Eval::NNUE::AccumulatorStack accumulators;
+        auto caches = std::make_unique<Eval::NNUE::AccumulatorCaches>(*networks);
+
+        // Evaluate position
+        Value score = Eval::evaluate(*networks, pos, accumulators, *caches, VALUE_ZERO);
+
+        // Convert to centipawns and return
+        return static_cast<int>(score);
     }
 }

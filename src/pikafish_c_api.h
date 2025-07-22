@@ -25,6 +25,13 @@ int pikafish_engine_init(void);
  */
 const char* pikafish_engine_info(void);
 
+/**
+ * Evaluate a chess position from FEN string
+ * @param fen - FEN string representing the chess position
+ * @return - evaluation score in centipawns (positive favors side to move)
+ */
+int pikafish_evaluate_position(const char* fen);
+
 #ifdef __cplusplus
 }
 #endif

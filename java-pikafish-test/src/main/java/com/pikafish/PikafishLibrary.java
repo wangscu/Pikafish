@@ -40,6 +40,14 @@ public interface PikafishLibrary extends Library {
     String pikafish_engine_info();
 
     /**
+     * 评估FEN棋局位置
+     *
+     * @param fen FEN字符串表示的棋局位置
+     * @return 评估分数（以分为单位，正值表示对当前走棋方有利）
+     */
+    int pikafish_evaluate_position(String fen);
+
+    /**
      * 工厂类用于创建PikafishLibrary实例
      */
     class Factory {
@@ -99,10 +107,7 @@ public interface PikafishLibrary extends Library {
 
             if (Platform.isMac()) {
                 return new String[] {
-                    parentDir + "/libpikafish.dylib",
-                    currentDir + "/libpikafish.dylib",
-                    "./libpikafish.dylib",
-                    "../libpikafish.dylib"
+                    "libpikafish.dylib",
                 };
             } else if (Platform.isWindows()) {
                 return new String[] {
