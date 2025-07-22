@@ -1,0 +1,111 @@
+# Minimal Makefile for Pikafish Shared Library
+# Usage: make -f Makefile.minimal [libpikafish.so|pikafish.dll|libpikafish.dylib|test|clean]
+
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -std=c++17 -fPIC -DNDEBUG -O3 -flto -Wall -Wcast-qual -fno-rtti -fno-exceptions
+LDFLAGS = -shared -flto
+LIBS = -lpthread -lm
+
+# Platform detection
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    TARGET = libpikafish.so
+    LDFLAGS += -Wl,--no-as-needed
+endif
+ifeq ($(UNAME_S),Darwin)
+    TARGET = libpikafish.dylib
+endif
+ifeq ($(UNAME_S),CYGWIN)
+    TARGET = pikafish.dll
+    LDFLAGS += -static-libgcc -static-libstdc++ -Wl,--no-undefined
+endif
+
+# Source directory
+SRCDIR = src
+
+# Essential object files (excluding main/UCI)
+CORE_OBJS = bitboard.o position.o evaluate.o misc.o movegen.o tune.o thread.o tt.o timeman.o \
+            nnue_misc.o nnue_accumulator.o network.o half_ka_v2_hm.o memory.o score.o search.o movepick.o
+
+# External dependencies
+EXTERNAL_OBJS = $(shell find $(SRCDIR)/external -name '*.o' 2>/dev/null)
+
+# API object
+API_OBJ = pikafish_minimal_api.o
+
+.PHONY: all clean test build-deps
+
+all: $(TARGET)
+
+# Build shared library
+$(TARGET): build-deps $(SRCDIR)/$(API_OBJ)
+	@echo "Linking shared library: $(TARGET)"
+	cd $(SRCDIR) && $(CXX) $(LDFLAGS) -o $@ $(API_OBJ) $(CORE_OBJS) $(EXTERNAL_OBJS) $(LIBS)
+	cp $(SRCDIR)/$(TARGET) .
+	@echo "✓ Built: $(TARGET)"
+
+# Build dependencies and API object
+build-deps:
+	@echo "Building dependencies..."
+	cd $(SRCDIR) && $(MAKE) ARCH=x86-64-avx2 COMP=gcc CXXFLAGS="$(CXXFLAGS)" build 2>/dev/null || true
+	@echo "✓ Dependencies built"
+
+$(SRCDIR)/$(API_OBJ): $(SRCDIR)/pikafish_minimal_api.cpp $(SRCDIR)/pikafish_minimal_api.h
+	@echo "Compiling minimal API..."
+	cd $(SRCDIR) && $(CXX) $(CXXFLAGS) -c pikafish_minimal_api.cpp -o $(API_OBJ)
+	@echo "✓ API compiled"
+
+# Build test program
+test: $(TARGET) test_minimal_api.cpp
+	@echo "Building test program..."
+	$(CXX) -std=c++17 -O2 -Wall test_minimal_api.cpp -L. -lpikafish -o test_minimal_api $(LIBS)
+	@echo "✓ Test program built"
+	@echo "Run with: LD_LIBRARY_PATH=. ./test_minimal_api"
+
+# Clean build artifacts
+clean:
+	rm -f $(TARGET) libpikafish.* pikafish.dll test_minimal_api
+	cd $(SRCDIR) && rm -f $(API_OBJ) && $(MAKE) objclean 2>/dev/null || true
+	@echo "✓ Cleaned"
+
+# Show build info
+info:
+	@echo "Platform: $(UNAME_S)"
+	@echo "Target: $(TARGET)"
+	@echo "Compiler: $(CXX)"
+	@echo "Flags: $(CXXFLAGS)"
+	@echo "Linker: $(LDFLAGS) $(LIBS)"
+
+# Build different targets explicitly
+libpikafish.so:
+	$(MAKE) -f Makefile.minimal TARGET=libpikafish.so LDFLAGS="-shared -flto -Wl,--no-as-needed"
+
+libpikafish.dylib:
+	$(MAKE) -f Makefile.minimal TARGET=libpikafish.dylib LDFLAGS="-shared -flto"
+
+pikafish.dll:
+	$(MAKE) -f Makefile.minimal TARGET=pikafish.dll LDFLAGS="-shared -flto -static-libgcc -static-libstdc++ -Wl,--no-undefined"
+
+help:
+	@echo "Pikafish Minimal Shared Library Build"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all                 - Build platform-appropriate shared library"
+	@echo "  libpikafish.so      - Build Linux shared library"
+	@echo "  libpikafish.dylib   - Build macOS dynamic library"
+	@echo "  pikafish.dll        - Build Windows DLL"
+	@echo "  test                - Build test program"
+	@echo "  clean               - Clean build artifacts"
+	@echo "  info                - Show build configuration"
+	@echo "  help                - Show this help"
+	@echo ""
+	@echo "Requirements:"
+	@echo "  - GCC 9.3+ or Clang 10.0+"
+	@echo "  - C++17 support"
+	@echo "  - pikafish.nnue model file"
+	@echo ""
+	@echo "Usage Examples:"
+	@echo "  make -f Makefile.minimal"
+	@echo "  make -f Makefile.minimal test"
+	@echo "  make -f Makefile.minimal clean"
