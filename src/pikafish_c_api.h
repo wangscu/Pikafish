@@ -47,9 +47,8 @@ int pikafish_init_position(const char* fen);
 uint64_t pikafish_do_move(uint16_t move);
 
 /**
- * Evaluate current position with fixed-depth search
- * @param depth - search depth in plies
- * @return - evaluation result structure
+ * Evaluate current position
+ * @return - evaluation score in centipawns (positive favors side to move)
  */
 int pikafish_evaluate();
 

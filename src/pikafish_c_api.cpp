@@ -32,27 +32,6 @@
 
 using namespace Stockfish;
 
-// Internal main function
-int pikafish_main(int argc, char* argv[]) {
-
-    std::cout << engine_info() << std::endl;
-
-    Bitboards::init();
-    Position::init();
-
-    UCIEngine uci(argc, argv);
-
-    Tune::init(uci.engine_options());
-
-    uci.loop();
-
-    return 0;
-}
-
-// Standard main function for executable
-int main(int argc, char* argv[]) {
-    return pikafish_main(argc, argv);
-}
 
 // Stateful engine implementation
 struct EngineState {
@@ -74,8 +53,7 @@ static void ensure_initialized() {
         Bitboards::init();
         Position::init();
         
-        engine.networks = std::make_unique<Eval::NNUE::Networks>(
-            Eval::NNUE::NetworkBig({EvalFileDefaultNameBig, "None", ""}));
+        engine.networks = std::make_unique<Eval::NNUE::Networks>(Eval::NNUE::NetworkBig({EvalFileDefaultNameBig, "None", ""}));
         engine.networks->big.load(".", EvalFileDefaultNameBig);
         
         engine.accumulators = std::make_unique<Eval::NNUE::AccumulatorStack>();
@@ -87,9 +65,6 @@ static void ensure_initialized() {
 
 // External C interface for shared library
 extern "C" {
-    int pikafish_engine_main(int argc, char* argv[]) {
-        return pikafish_main(argc, argv);
-    }
 
     // Initialize the engine without starting the main loop
     int pikafish_engine_init(void) {
@@ -114,8 +89,11 @@ extern "C" {
         StateInfo temp_si;
         temp_pos.set(std::string(fen), &temp_si);
         
+        // Use tempo bonus based on side to move instead of VALUE_ZERO
+        // In chess evaluation, tempo is typically a small bonus (around 10-20 centipawns) for the side to move
         Value score = Eval::evaluate(*engine.networks, temp_pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
-        return static_cast<int>(score);
+        // Adjust score based on side to move: positive score means advantage for side to move
+        return temp_pos.side_to_move() == WHITE ? static_cast<int>(score) : -static_cast<int>(score);
     }
 
     // Stateful engine API
@@ -153,12 +131,9 @@ extern "C" {
     int pikafish_evaluate() {
         ensure_initialized();
         
-        //PikafishEvaluation result = {0, 0, ""};
-        
         // For now, use static evaluation
         // TODO: Implement actual search with given depth
         Value score = Eval::evaluate(*engine.networks, engine.pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
-        return static_cast<int>(score);
     }
 
     // Undo last move
@@ -169,6 +144,7 @@ extern "C" {
         Move m(move);
 
         engine.pos.undo_move(m);
+        engine.accumulators->pop();
         engine.states.pop_back();
         return 0;
     }

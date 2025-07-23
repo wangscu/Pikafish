@@ -16,14 +16,6 @@ import com.sun.jna.Platform;
  */
 public interface PikafishLibrary extends Library {
 
-    /**
-     * Pikafish引擎主入口点，等同于原来的main函数
-     *
-     * @param argc 命令行参数数量
-     * @param argv 命令行参数数组
-     * @return 退出代码
-     */
-    int pikafish_engine_main(int argc, String[] argv);
 
     /**
      * 初始化Pikafish引擎但不启动主循环
