@@ -131,8 +131,7 @@ public class PikafishIntegrationTest {
         String[] moves = {"c2c5", "c7c4", "h2h5", "h7h4"};
         
         for (String moveStr : moves) {
-            //short move = MoveEncoder.fromCoordinate(moveStr);
-            short move = 12;
+            short move = MoveEncoder.fromCoordinate(moveStr);
             assertTrue(MoveEncoder.isValidMove(move), "Move should be valid: " + moveStr);
             
             long hash = library.pikafish_do_move(move);
@@ -189,6 +188,72 @@ public class PikafishIntegrationTest {
         
         System.out.println("Average evaluation time: " + avgTime + " ms");
         assertTrue(avgTime < 100, "Evaluation should be reasonably fast");
+    }
+
+    @Test
+    @DisplayName("Encode and decode move test")
+    void testEncodeAndDecodeMove() {
+        Assumptions.assumeTrue(libraryAvailable, "Library not available");
+        
+        // Test encoding a move
+        String moveStr = "c2c5";
+        short encodedMove = library.pikafish_encode_move(moveStr);
+        assertNotEquals(0, encodedMove, "Encoded move should not be zero");
+        
+        // Test decoding the move
+        String decodedMove = library.pikafish_decode_move(encodedMove);
+        assertEquals(moveStr, decodedMove, "Decoded move should match original");
+        
+        // Test with another move
+        moveStr = "h2h5";
+        encodedMove = library.pikafish_encode_move(moveStr);
+        assertNotEquals(0, encodedMove, "Encoded move should not be zero");
+        
+        decodedMove = library.pikafish_decode_move(encodedMove);
+        assertEquals(moveStr, decodedMove, "Decoded move should match original");
+        
+        // Test with null move
+        moveStr = "0000";
+        encodedMove = library.pikafish_encode_move(moveStr);
+        assertEquals(129, encodedMove, "Null move should encode to 129");
+        
+        decodedMove = library.pikafish_decode_move(encodedMove);
+        assertEquals(moveStr, decodedMove, "Decoded null move should match original");
+        
+        // Test with invalid move
+        moveStr = "invalid";
+        encodedMove = library.pikafish_encode_move(moveStr);
+        assertEquals(0, encodedMove, "Invalid move should encode to 0");
+        
+        decodedMove = library.pikafish_decode_move((short) 0);
+        assertEquals("(none)", decodedMove, "Decoded zero should be (none)");
+    }
+
+    @Test
+    @DisplayName("Compare JNA encoding with Java implementation")
+    void testJnaEncodingVsJavaImplementation() {
+        Assumptions.assumeTrue(libraryAvailable, "Library not available");
+        
+        // Test several moves to compare JNA encoding with Java implementation
+        String[] moves = {"c2c5", "h2h5", "e2e1", "a0a1", "i9i8"};
+        
+        for (String moveStr : moves) {
+            // Encode using JNA
+            short jnaEncoded = library.pikafish_encode_move(moveStr);
+            
+            // Encode using Java implementation
+            short javaEncoded = MoveEncoder.fromCoordinate(moveStr);
+            
+            // They should match
+            assertEquals(javaEncoded, jnaEncoded, "JNA and Java encoding should match for " + moveStr);
+            
+            // If valid, decode using JNA and compare with Java implementation
+            if (jnaEncoded != 0) {
+                String jnaDecoded = library.pikafish_decode_move(jnaEncoded);
+                String javaDecoded = MoveEncoder.toCoordinate(javaEncoded);
+                assertEquals(javaDecoded, jnaDecoded, "JNA and Java decoding should match for " + moveStr);
+            }
+        }
     }
 
     private void testOpeningMove(String moveStr, String description) {

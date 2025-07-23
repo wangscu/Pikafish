@@ -70,6 +70,20 @@ public interface PikafishLibrary extends Library {
     String pikafish_get_fen();
 
     /**
+     * Encode a move from coordinate notation to internal representation
+     * @param move_str - move in coordinate notation (e.g., "e2e4")
+     * @return - encoded move as uint16_t, 0 if invalid
+     */
+    short pikafish_encode_move(String move_str);
+
+    /**
+     * Decode a move from internal representation to coordinate notation
+     * @param move - encoded move as uint16_t
+     * @return - move in coordinate notation (e.g., "e2e4"), NULL if invalid
+     */
+    String pikafish_decode_move(short move);
+
+    /**
      * 撤销最后一步移动
      *
      * @param move 16位无符号整数表示的要撤销的移动

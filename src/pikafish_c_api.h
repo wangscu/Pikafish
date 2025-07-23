@@ -64,6 +64,20 @@ char* pikafish_get_fen();
  */
 uint64_t pikafish_undo_move(uint16_t move);
 
+/**
+ * Encode a move from coordinate notation to internal representation
+ * @param move_str - move in coordinate notation (e.g., "e2e4")
+ * @return - encoded move as uint16_t, 0 if invalid
+ */
+uint16_t pikafish_encode_move(const char* move_str);
+
+/**
+ * Decode a move from internal representation to coordinate notation
+ * @param move - encoded move as uint16_t
+ * @return - move in coordinate notation (e.g., "e2e4"), NULL if invalid
+ */
+char* pikafish_decode_move(uint16_t move);
+
 #ifdef __cplusplus
 }
 #endif

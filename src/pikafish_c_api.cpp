@@ -152,10 +152,92 @@ extern "C" {
             return -1;
         }
         Move m(move);
-
+ 
         engine.pos.undo_move(m);
         engine.accumulators->pop();
         engine.states.pop_back();
         return 0;
+    }
+    
+    // Encode a move from coordinate notation to internal representation
+    uint16_t pikafish_encode_move(const char* move_str) {
+        // Handle null pointer
+        if (!move_str) return 0;
+        
+        // Handle special cases
+        if (strcmp(move_str, "(none)") == 0) {
+            return 0;
+        }
+        
+        if (strcmp(move_str, "0000") == 0) {
+            return 129; // null move
+        }
+        
+        // Check minimum length for coordinate notation (should be at least 4 characters)
+        if (strlen(move_str) < 4) {
+            return 0;
+        }
+        
+        // Parse from square
+        int fromFile = move_str[0] - 'a';
+        int fromRank = move_str[1] - '0';
+        
+        // Parse to square
+        int toFile = move_str[2] - 'a';
+        int toRank = move_str[3] - '0';
+        
+        // Validate coordinates are within bounds
+        // Chinese chess board is 9 files (a-i) and 10 ranks (0-9)
+        if (fromFile < 0 || fromFile > 8 || fromRank < 0 || fromRank > 9 ||
+            toFile < 0 || toFile > 8 || toRank < 0 || toRank > 9) {
+            return 0;
+        }
+        
+        // Convert to square numbers (0-89)
+        int fromSquare = fromRank * 9 + fromFile;
+        int toSquare = toRank * 9 + toFile;
+        
+        // Encode as 16-bit value: (from << 7) | to
+        return (fromSquare << 7) | toSquare;
+    }
+    
+    // Decode a move from internal representation to coordinate notation
+    char* pikafish_decode_move(uint16_t move) {
+        // Handle special cases
+        if (move == 0) {
+            static char none_str[] = "(none)";
+            return none_str;
+        }
+
+        if (move == 129) {
+            static char null_str[] = "0000";
+            return null_str;
+        }
+
+        // Extract from and to squares
+        int fromSquare = (move >> 7) & 0x7F;
+        int toSquare = move & 0x7F;
+
+        // Validate squares
+        if (fromSquare < 0 || fromSquare >= 90 || toSquare < 0 || toSquare >= 90) {
+            static char invalid_str[] = "(none)";
+            return invalid_str;
+        }
+
+        // Convert squares to file/rank
+        int fromFile = fromSquare % 9;
+        int fromRank = fromSquare / 9;
+        int toFile = toSquare % 9;
+        int toRank = toSquare / 9;
+
+        // Use static storage for the result string
+        static char move_str[5]; // 4 characters + null terminator
+        move_str[0] = 'a' + fromFile;
+        move_str[1] = '0' + fromRank;
+        move_str[2] = 'a' + toFile;
+        move_str[3] = '0' + toRank;
+        move_str[4] = '\0';
+
+        return move_str;
     }
 }

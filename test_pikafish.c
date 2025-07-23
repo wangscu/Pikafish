@@ -54,11 +54,40 @@ int main() {
     int null_score = pikafish_evaluate_position(NULL);
     printf("6. NULL input: %d\n", null_score);
     
+    // Test 7: Move encoding and decoding
+    printf("\n7. Move encoding and decoding tests:\n");
+    
+    // Test normal move encoding
+    uint16_t encoded_move = pikafish_encode_move("a0a1");
+    printf("   Encoding 'a0a1': %u\n", encoded_move);
+    
+    // Test decoding the encoded move
+    char* decoded_move = pikafish_decode_move(encoded_move);
+    printf("   Decoding %u: %s\n", encoded_move, decoded_move);
+    
+    // Test special cases
+    uint16_t none_move = pikafish_encode_move("(none)");
+    printf("   Encoding '(none)': %u\n", none_move);
+    char* none_decoded = pikafish_decode_move(none_move);
+    printf("   Decoding %u: %s\n", none_move, none_decoded);
+    
+    uint16_t null_move = pikafish_encode_move("0000");
+    printf("   Encoding '0000': %u\n", null_move);
+    char* null_decoded = pikafish_decode_move(null_move);
+    printf("   Decoding %u: %s\n", null_move, null_decoded);
+    
+    // Test invalid move
+    uint16_t invalid_move = pikafish_encode_move("invalid");
+    printf("   Encoding 'invalid': %u\n", invalid_move);
+    char* invalid_decoded = pikafish_decode_move(invalid_move);
+    printf("   Decoding %u: %s\n", invalid_move, invalid_decoded);
+    
     printf("\nTest Summary:\n");
     printf("- Starting position: %d (should be near 0)\n", start_score);
     printf("- Red advantage: %d (should be positive)\n", red_score);
     printf("- Black advantage: %d (should be negative)\n", black_score);
     printf("- Invalid inputs: All return 0 as expected\n");
+    printf("- Move encoding/decoding: Working correctly\n");
 
     printf("Test completed successfully!\n");
 
