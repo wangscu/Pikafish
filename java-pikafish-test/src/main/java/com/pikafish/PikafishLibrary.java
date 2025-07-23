@@ -12,6 +12,7 @@ import com.sun.jna.Platform;
  * 这个接口映射了pikafish_c_api.h中定义的C函数：
  * - pikafish_engine_init: 初始化引擎
  * - pikafish_engine_info: 获取引擎信息
+ * - pikafish_get_fen: 获取当前局面的FEN表示
  */
 public interface PikafishLibrary extends Library {
 
@@ -60,6 +61,13 @@ public interface PikafishLibrary extends Library {
      * @return 评估分数（以分为单位）
      */
     int pikafish_evaluate();
+
+    /**
+     * 获取当前局面的FEN表示
+     *
+     * @return 当前局面的FEN字符串
+     */
+    String pikafish_get_fen();
 
     /**
      * 撤销最后一步移动

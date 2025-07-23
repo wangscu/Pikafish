@@ -53,6 +53,12 @@ uint64_t pikafish_do_move(uint16_t move);
 int pikafish_evaluate();
 
 /**
+ * Get current position in FEN format
+ * @return - pointer to FEN string (static memory)
+ */
+char* pikafish_get_fen();
+
+/**
  * Undo the last move
  * @return - 0 on success, non-zero on error
  */

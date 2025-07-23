@@ -137,6 +137,15 @@ extern "C" {
         return engine.pos.side_to_move() == WHITE ? static_cast<int>(score) : -static_cast<int>(score);
     }
 
+    char* pikafish_get_fen() {
+        ensure_initialized();
+        // Return current position in FEN format
+        // Use static storage to ensure the returned string remains valid
+        static std::string fen_string;
+        fen_string = engine.pos.fen();
+        return const_cast<char*>(fen_string.c_str());
+    }
+
     // Undo last move
     uint64_t pikafish_undo_move(uint16_t move) {
         if (engine.states.size() <= 1) {

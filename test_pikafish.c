@@ -29,6 +29,7 @@ int main() {
 
     pikafish_do_move(12);
     printf("2. move 12 (extra rook): %d\n", pikafish_evaluate());
+    printf("2. move 12 (extra rook)fen: %s\n", pikafish_get_fen());
     pikafish_undo_move(12);
     printf("2. undo_move 12 (extra rook): %d\n", pikafish_evaluate());
 
