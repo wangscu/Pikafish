@@ -134,6 +134,7 @@ extern "C" {
         // For now, use static evaluation
         // TODO: Implement actual search with given depth
         Value score = Eval::evaluate(*engine.networks, engine.pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
+        return engine.pos.side_to_move() == WHITE ? static_cast<int>(score) : -static_cast<int>(score);
     }
 
     // Undo last move

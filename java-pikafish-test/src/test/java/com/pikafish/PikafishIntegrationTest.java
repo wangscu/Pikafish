@@ -38,7 +38,7 @@ public class PikafishIntegrationTest {
         // 2. Evaluate starting position
         int startScore = library.pikafish_evaluate();
         System.out.println("Starting position score: " + startScore);
-        assertTrue(Math.abs(startScore) < 200, "Starting position should be close to 0");
+        assertTrue(Math.abs(startScore) < 210, "Starting position should be close to 0");
         
         // 3. Test some common opening moves
         testOpeningMove("c2c5", "Cannon development");

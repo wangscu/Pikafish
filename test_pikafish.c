@@ -23,12 +23,22 @@ int main() {
     // Test 2: Red has extra rook
     const char* red_advantage = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKAB1R w";
     int red_score = pikafish_evaluate_position(red_advantage);
-    printf("2. Red advantage (extra rook): %d\n", red_score);
+    pikafish_init_position(red_advantage);
+    int red_score_state = pikafish_evaluate();
+    printf("2. Red advantage (extra rook): %d, %d\n", red_score, red_score_state);
+
+    pikafish_do_move(12);
+    printf("2. move 12 (extra rook): %d\n", pikafish_evaluate());
+    pikafish_undo_move(12);
+    printf("2. undo_move 12 (extra rook): %d\n", pikafish_evaluate());
+
     
     // Test 3: Same position but black to move
     const char* black_advantage = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKAB1R b";
     int black_score = pikafish_evaluate_position(black_advantage);
-    printf("3. Black advantage (extra rook): %d\n", black_score);
+    pikafish_init_position(black_advantage);
+    int black_score_state = pikafish_evaluate();
+    printf("3. Black advantage (extra rook): %d, %d\n", black_score, black_score_state);
     
     // Test 4: Empty board (should return 0)
     const char* empty_fen = "9/9/9/9/9/9/9/9/9/9 w";

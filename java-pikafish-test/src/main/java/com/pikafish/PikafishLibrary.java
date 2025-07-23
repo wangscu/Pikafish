@@ -10,7 +10,6 @@ import com.sun.jna.Platform;
  * JNA接口，用于调用Pikafish共享库的C函数
  *
  * 这个接口映射了pikafish_c_api.h中定义的C函数：
- * - pikafish_engine_main: 主入口点
  * - pikafish_engine_init: 初始化引擎
  * - pikafish_engine_info: 获取引擎信息
  */
