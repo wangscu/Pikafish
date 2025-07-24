@@ -83,11 +83,10 @@ public interface PikafishLibrary extends Library {
      * @return - move in coordinate notation (e.g., "e2e4"), NULL if invalid
      */
     String pikafish_decode_move(short move);
-
-   
+    
    /**
     * Generate a list of legal moves for the current position (array version)
-    * @param moves - array to store legal moves (must be at least MAX_MOVES in size)
+    * @param moves - array to store legal moves (must be at least MAX_MOVES + 1 in size)
     * @return - number of legal moves generated
     */
    int pikafish_generate_legal_moves(short[] moves);
