@@ -1,3 +1,6 @@
+qdrant eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.E-gbMyZHSEdzcU5HLOVZ_i5dibAKd4l7wkZZw7w_ugM
+
+
 # Pikafish Shared Library
 
 这是修改后的Pikafish引擎，支持编译为共享库(.so/.dll/.dylib)并提供C语言接口。

@@ -51,5 +51,6 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "vector": "cpp"
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "automatic"
 }
