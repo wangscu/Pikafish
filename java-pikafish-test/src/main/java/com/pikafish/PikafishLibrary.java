@@ -5,6 +5,7 @@ import java.io.File;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
+import com.sun.jna.Pointer;
 
 /**
  * JNA接口，用于调用Pikafish共享库的C函数
@@ -83,12 +84,20 @@ public interface PikafishLibrary extends Library {
      */
     String pikafish_decode_move(short move);
 
-    /**
-     * 撤销最后一步移动
-     *
-     * @param move 16位无符号整数表示的要撤销的移动
-     * @return 0表示成功，非0表示失败
-     */
+   
+   /**
+    * Generate a list of legal moves for the current position (array version)
+    * @param moves - array to store legal moves (must be at least MAX_MOVES in size)
+    * @return - number of legal moves generated
+    */
+   int pikafish_generate_legal_moves(short[] moves);
+
+   /**
+    * 撤销最后一步移动
+    *
+    * @param move 16位无符号整数表示的要撤销的移动
+    * @return 0表示成功，非0表示失败
+    */
     long pikafish_undo_move(short move);
 
     /**

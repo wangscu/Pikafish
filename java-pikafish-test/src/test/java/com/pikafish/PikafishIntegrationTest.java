@@ -272,4 +272,38 @@ public class PikafishIntegrationTest {
             }
         }
     }
+    
+    @Test
+    @DisplayName("Generate legal moves array test")
+    void testGenerateLegalMovesArray() {
+        Assumptions.assumeTrue(libraryAvailable, "Library not available");
+
+        // Initialize position
+        String fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
+        library.pikafish_init_position(fen);
+
+        // Generate legal moves using array version
+        short[] moves = new short[128]; // MAX_MOVES + 1
+        int moveCount = library.pikafish_generate_legal_moves(moves);
+
+        // There should be at least some legal moves in the starting position
+        assertTrue(moveCount > 0, "There should be at least one legal move");
+        System.out.println("Number of legal moves (array version): " + moveCount);
+
+        // Verify that all moves are valid
+        for (int i = 0; i < moveCount; i++) {
+            short move = moves[i];
+            assertNotEquals(0, move, "Move should not be zero");
+            
+            // Decode the move to verify it's valid
+            String moveStr = library.pikafish_decode_move(move);
+            assertNotNull(moveStr, "Decoded move should not be null");
+            assertNotEquals("(none)", moveStr, "Decoded move should not be (none)");
+            
+            System.out.println("Move " + i + ": " + move + " -> " + moveStr);
+        }
+        
+        // The last element should be 0 (end marker)
+        assertEquals(0, moves[moveCount], "Last element should be 0");
+    }
 }

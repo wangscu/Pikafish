@@ -46,6 +46,14 @@ int pikafish_init_position(const char* fen);
  */
 uint64_t pikafish_do_move(uint16_t move);
 
+
+/**
+ * Generate a list of legal moves for the current position (array version)
+ * @param moves - array to store legal moves (must be at least MAX_MOVES + 1 in size)
+ * @return - number of legal moves generated
+ */
+int pikafish_generate_legal_moves(uint16_t moves[]);
+
 /**
  * Evaluate current position
  * @return - evaluation score in centipawns (positive favors side to move)

@@ -82,12 +82,38 @@ int main() {
     char* invalid_decoded = pikafish_decode_move(invalid_move);
     printf("   Decoding %u: %s\n", invalid_move, invalid_decoded);
     
+    // Test 8: Legal moves generation
+    printf("\n8. Legal moves generation test:\n");
+    
+    // Initialize position
+    pikafish_init_position(start_fen);
+    
+    // Generate legal moves
+    uint16_t moves[128]; // MAX_MOVES
+    int moveCountFromArray = pikafish_generate_legal_moves(moves);
+    
+    // Count and display moves
+    int move_count = 0;
+    printf("   Legal moves: ");
+    for (int i = 0; moves[i] != 0; i++) {
+        move_count++;
+        if (i < 10) { // Only print first 10 moves to avoid cluttering output
+            char* move_str = pikafish_decode_move(moves[i]);
+            printf("%s ", move_str);
+        }
+    }
+    if (move_count > 10) {
+        printf("... and %d more moves", move_count - 10);
+    }
+    printf("\n   Total legal moves: %d\n", move_count);
+    
     printf("\nTest Summary:\n");
     printf("- Starting position: %d (should be near 0)\n", start_score);
     printf("- Red advantage: %d (should be positive)\n", red_score);
     printf("- Black advantage: %d (should be negative)\n", black_score);
     printf("- Invalid inputs: All return 0 as expected\n");
     printf("- Move encoding/decoding: Working correctly\n");
+    printf("- Legal moves generation: Generated %d moves\n", move_count);
 
     printf("Test completed successfully!\n");
 

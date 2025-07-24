@@ -78,7 +78,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.pikafish.CannonDemo</mainClass>
+                    <mainClass>com.pikafish.PikafishTest</mainClass>
                     <systemProperties>
                         <systemProperty>
                             <key>java.library.path</key>
@@ -88,114 +88,24 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>run-cannon-demo</id>
+                        <id>run-main</id>
                         <goals>
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.pikafish.CannonDemo</mainClass>
+                            <mainClass>com.pikafish.PikafishTest</mainClass>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>run-rook-test</id>
+                        <id>run-generate-moves-example</id>
                         <goals>
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                                                    <mainClass>com.pikafish.RookAttackTest</mainClass>
-                                                </configuration>
-                                            </execution>
-                                            <execution>
-                                                <id>run-rook-non-attack-test</id>
-                                                <goals>
-                                                    <goal>java</goal>
-                                                </goals>
-                                                <configuration>
-                                                                            <mainClass>com.pikafish.RookNonAttackTest</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-rook-non-attack-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.RookNonAttackDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-rook-relevant-occupancy-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.RookRelevantOccupancyDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-simple-rook-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.SimpleRookDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-detailed-rook-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.DetailedRookDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-simple-direction-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.SimpleDirectionDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-is-opposite-edge-test</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.IsOppositeEdgeTest</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-edge-movement-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.EdgeMovementDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-detailed-is-opposite-edge-test</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.DetailedIsOppositeEdgeTest</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                    <execution>
-                                                                        <id>run-simple-relevant-occupancy-debug</id>
-                                                                        <goals>
-                                                                            <goal>java</goal>
-                                                                        </goals>
-                                                                        <configuration>
-                                                                            <mainClass>com.pikafish.SimpleRelevantOccupancyDebug</mainClass>
-                                                                        </configuration>
-                                                                    </execution>
-                                                                </executions>
+                            <mainClass>com.pikafish.GenerateMovesExample</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

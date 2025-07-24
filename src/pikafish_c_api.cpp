@@ -28,6 +28,7 @@
 #include "tune.h"
 #include "evaluate.h"
 #include "nnue/network.h"
+#include "movegen.h"
 #include "pikafish_c_api.h"
 
 using namespace Stockfish;
@@ -239,5 +240,26 @@ extern "C" {
         move_str[4] = '\0';
 
         return move_str;
+    }
+    
+    // Generate a list of legal moves for the current position (array version)
+    int pikafish_generate_legal_moves(uint16_t moves[]) {
+        ensure_initialized();
+        
+        // Generate legal moves using the MoveList class
+        MoveList<LEGAL> legalMoves(engine.pos);
+        
+        // Convert moves to uint16_t format and store in the array
+        size_t i = 0;
+        for (const auto& move : legalMoves) {
+            moves[i++] = move.raw(); // Extract the raw 16-bit representation of the move
+            if (i > MAX_MOVES) break; // Prevent buffer overflow
+        }
+        
+        // Terminate the array with 0 to indicate the end
+        moves[i] = 0;
+        
+        // Return the number of moves generated
+        return static_cast<int>(i);
     }
 }

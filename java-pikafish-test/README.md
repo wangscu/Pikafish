@@ -13,6 +13,7 @@ java-pikafish-test/
 │   │       └── com/
 │   │           └── pikafish/
 │   │               ├── PikafishLibrary.java   # JNA接口定义
+│   │               ├── GenerateMovesExample.java # 合法走法生成示例程序
 │   │               └── PikafishTest.java      # 主测试程序
 │   └── test/
 │       └── java/
@@ -35,6 +36,8 @@ JNA接口类，映射了Pikafish C API的以下函数：
 - `pikafish_engine_main(int argc, String[] argv)` - 引擎主入口
 - `pikafish_engine_init()` - 初始化引擎
 - `pikafish_engine_info()` - 获取引擎信息
+- `pikafish_generate_legal_moves()` - 生成当前局面的合法走法（指针版本）
+- `pikafish_generate_legal_moves_array(short[] moves)` - 生成当前局面的合法走法（数组版本）
 
 ### PikafishTest.java
 主测试程序，演示如何：
@@ -42,11 +45,18 @@ JNA接口类，映射了Pikafish C API的以下函数：
 - 调用各种API函数
 - 处理错误情况
 
+### GenerateMovesExample.java
+合法走法生成示例程序，演示如何：
+- 使用指针版本和数组版本的合法走法生成功能
+- 比较两种方法的结果
+- 解析和显示生成的走法
+
 ### PikafishLibraryTest.java
 JUnit 5测试套件，包含：
 - 引擎信息获取测试
 - 引擎初始化测试
 - 多次调用稳定性测试
+- 合法走法生成功能测试
 
 ## 构建和运行
 
@@ -74,7 +84,19 @@ mvn clean compile
 java -Djava.library.path=.. -cp target/classes com.pikafish.PikafishTest
 ```
 
-### 4. 运行测试
+### 4. 运行合法走法生成示例程序
+使用默认配置运行：
+```bash
+mvn exec:java@run-generate-moves-example
+```
+
+或者直接使用java命令：
+```bash
+mvn clean compile
+java -Djava.library.path=.. -cp target/classes com.pikafish.GenerateMovesExample
+```
+
+### 5. 运行测试
 ```bash
 mvn test
 ```
@@ -85,6 +107,27 @@ mvn test -Dtest=PikafishLibraryTest
 ```
 
 ## 输出示例
+
+### 合法走法生成示例程序输出
+```
+Legal moves (pointer version): 20
+Legal moves (array version): 20
+Both methods returned the same number of moves - SUCCESS
+
+First 5 moves from pointer version:
+  0: 1664 -> a0a1
+  1: 1728 -> a0b0
+  2: 1792 -> a0c0
+  3: 1920 -> a0e0
+  4: 1984 -> a0f0
+
+First 5 moves from array version:
+  0: 1664 -> a0a1
+  1: 1728 -> a0b0
+  2: 1792 -> a0c0
+  3: 1920 -> a0e0
+  4: 1984 -> a0f0
+```
 
 ### 主程序输出
 ```
