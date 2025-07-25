@@ -94,7 +94,7 @@ extern "C" {
         // In chess evaluation, tempo is typically a small bonus (around 10-20 centipawns) for the side to move
         Value score = Eval::evaluate(*engine.networks, temp_pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
         // Adjust score based on side to move: positive score means advantage for side to move
-        return temp_pos.side_to_move() == WHITE ? static_cast<int>(score) : -static_cast<int>(score);
+        return static_cast<int>(score);
     }
 
     // Stateful engine API
@@ -107,6 +107,8 @@ extern "C" {
         
         engine.states = std::deque<StateInfo>(1);
         engine.pos.set(std::string(fen), &engine.states.back());
+        engine.accumulators = std::make_unique<Eval::NNUE::AccumulatorStack>();
+        engine.caches = std::make_unique<Eval::NNUE::AccumulatorCaches>(*engine.networks);
         
         return 0;
     }
@@ -148,7 +150,7 @@ extern "C" {
         // For now, use static evaluation
         // TODO: Implement actual search with given depth
         Value score = Eval::evaluate(*engine.networks, engine.pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
-        return engine.pos.side_to_move() == WHITE ? static_cast<int>(score) : -static_cast<int>(score);
+        return static_cast<int>(score);
     }
 
     char* pikafish_get_fen() {
