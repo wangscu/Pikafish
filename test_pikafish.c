@@ -16,9 +16,15 @@ int main() {
     printf("Comprehensive Pikafish evaluation test...\n");
     
     // Test 1: Starting position
-    const char* start_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
+    const char* start_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
     int start_score = pikafish_evaluate_position(start_fen);
     printf("1. Starting position: %d\n", start_score);
+    pikafish_init_position(start_fen);
+    pikafish_do_move(3492);
+    printf("1. move 3492 (extra rook)fen: %s\n", pikafish_get_fen());
+    pikafish_undo_move(3492);
+    printf("1. undo_move 3492 (extra rook)fen: %s\n", pikafish_get_fen());
+
     
     // Test 2: Red has extra rook
     const char* red_advantage = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKAB1R w";

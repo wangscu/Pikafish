@@ -128,6 +128,19 @@ extern "C" {
         return engine.pos.key();
     }
 
+    // Undo last move
+    uint64_t pikafish_undo_move(uint16_t move) {
+        //if (engine.states.size() <= 1) {
+        //    return -1;
+        //}
+        Move m(move);
+ 
+        engine.pos.undo_move(m);
+        engine.accumulators->pop();
+        engine.states.pop_back();
+        return 0;
+    }
+
     // Evaluate current position
     int pikafish_evaluate() {
         ensure_initialized();
@@ -147,18 +160,6 @@ extern "C" {
         return const_cast<char*>(fen_string.c_str());
     }
 
-    // Undo last move
-    uint64_t pikafish_undo_move(uint16_t move) {
-        if (engine.states.size() <= 1) {
-            return -1;
-        }
-        Move m(move);
- 
-        engine.pos.undo_move(m);
-        engine.accumulators->pop();
-        engine.states.pop_back();
-        return 0;
-    }
     
     // Encode a move from coordinate notation to internal representation
     uint16_t pikafish_encode_move(const char* move_str) {
