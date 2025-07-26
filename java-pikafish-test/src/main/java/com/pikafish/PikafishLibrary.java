@@ -5,7 +5,6 @@ import java.io.File;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
-import com.sun.jna.Pointer;
 
 /**
  * JNA接口，用于调用Pikafish共享库的C函数
@@ -99,6 +98,14 @@ public interface PikafishLibrary extends Library {
     */
     long pikafish_undo_move(short move);
 
+    /**
+     * 检查指定方是否被将军
+     *
+     * @param is_white true表示检查白方，false表示检查黑方
+     * @return true表示被将军，false表示未被将军
+     */
+    int pikafish_is_side_in_check(int is_white);
+    
     /**
      * 工厂类用于创建PikafishLibrary实例
      */

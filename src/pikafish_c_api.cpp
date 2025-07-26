@@ -80,6 +80,14 @@ extern "C" {
         return info.c_str();
     }
 
+    // Check if the given side is in check
+    int pikafish_is_side_in_check(int is_white) {
+        ensure_initialized();
+        Color c = is_white ? WHITE : BLACK;
+        Square kingSquare = engine.pos.king_square(c);
+        return int(engine.pos.checkers_to(~c, kingSquare, engine.pos.pieces()));
+    }
+
     // Stateful engine API
 
     // Initialize position from FEN

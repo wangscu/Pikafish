@@ -127,9 +127,10 @@ int main() {
     int w_score = pikafish_evaluate_position(w_fen);
     int b_score = pikafish_evaluate_position(b_fen);
     printf("Test 11, same fen diff side, w:%d, b:%d \n", w_score, b_score);
-
-
+    printf("w fen: %s\n", pikafish_is_side_in_check(1) ? "in check" : "not in check");
+    printf("b fen: %s\n", pikafish_is_side_in_check(0) ? "in check" : "not in check");
     printf("Test completed successfully!\n");
 
     return 0;
 }
+    

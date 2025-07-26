@@ -306,4 +306,16 @@ public class PikafishIntegrationTest {
         // The last element should be 0 (end marker)
         assertEquals(0, moves[moveCount], "Last element should be 0");
     }
+
+    @Test
+    @DisplayName("Generate legal moves array test")
+    void testCheck() {
+        Assumptions.assumeTrue(libraryAvailable, "Library not available");
+
+        // Initialize position
+        String fen = "1nbakRbnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/1NBAKrBNR w - - 0 1";
+        library.pikafish_init_position(fen);
+        Assertions.assertEquals(1, library.pikafish_is_side_in_check(1));
+        Assertions.assertEquals(1, library.pikafish_is_side_in_check(0));
+    }
 }

@@ -1,6 +1,8 @@
 #ifndef PIKAFISH_C_API_H
 #define PIKAFISH_C_API_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +33,13 @@ const char* pikafish_engine_info(void);
  * @return - evaluation score in centipawns (positive favors side to move)
  */
 int pikafish_evaluate_position(const char* fen);
+
+/**
+ * Check if the given side is in check
+ * @param is_white - 1 for white side, 0 for black side
+ * @return - 1 if the specified side is in check, 0 otherwise
+ */
+int pikafish_is_side_in_check(int is_white);
 
 /**
  * Initialize position from FEN string
