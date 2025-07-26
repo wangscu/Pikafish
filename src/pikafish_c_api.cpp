@@ -80,23 +80,6 @@ extern "C" {
         return info.c_str();
     }
 
-    // Legacy function for backward compatibility
-    int pikafish_evaluate_position(const char* fen) {
-        if (!fen) return 0;
-        
-        ensure_initialized();
-        
-        Position temp_pos;
-        StateInfo temp_si;
-        temp_pos.set(std::string(fen), &temp_si);
-        
-        // Use tempo bonus based on side to move instead of VALUE_ZERO
-        // In chess evaluation, tempo is typically a small bonus (around 10-20 centipawns) for the side to move
-        Value score = Eval::evaluate(*engine.networks, temp_pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
-        // Adjust score based on side to move: positive score means advantage for side to move
-        return static_cast<int>(score);
-    }
-
     // Stateful engine API
 
     // Initialize position from FEN
@@ -150,6 +133,24 @@ extern "C" {
         // For now, use static evaluation
         // TODO: Implement actual search with given depth
         Value score = Eval::evaluate(*engine.networks, engine.pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
+        int value = static_cast<int>(score);
+        return engine.pos.side_to_move()==WHITE?value:-value;
+    }
+
+    // Legacy function for backward compatibility
+    int pikafish_evaluate_position(const char* fen) {
+        if (!fen) return 0;
+        
+        ensure_initialized();
+        
+        Position temp_pos;
+        StateInfo temp_si;
+        temp_pos.set(std::string(fen), &temp_si);
+        
+        // Use tempo bonus based on side to move instead of VALUE_ZERO
+        // In chess evaluation, tempo is typically a small bonus (around 10-20 centipawns) for the side to move
+        Value score = Eval::evaluate(*engine.networks, temp_pos, *engine.accumulators, *engine.caches, VALUE_ZERO);
+        // Adjust score based on side to move: positive score means advantage for side to move
         return static_cast<int>(score);
     }
 

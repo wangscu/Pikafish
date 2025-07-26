@@ -121,6 +121,14 @@ int main() {
     printf("- Move encoding/decoding: Working correctly\n");
     printf("- Legal moves generation: Generated %d moves\n", move_count);
 
+    // Test 11: diff side
+    const char* w_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/3R5/1NBAKAB1R w - - 1 1";
+    const char* b_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/3R5/1NBAKAB1R b - - 1 1";
+    int w_score = pikafish_evaluate_position(w_fen);
+    int b_score = pikafish_evaluate_position(b_fen);
+    printf("Test 11, same fen diff side, w:%d, b:%d \n", w_score, b_score);
+
+
     printf("Test completed successfully!\n");
 
     return 0;
