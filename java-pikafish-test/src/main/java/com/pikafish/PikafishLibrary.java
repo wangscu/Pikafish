@@ -10,101 +10,111 @@ import com.sun.jna.Platform;
  * JNA接口，用于调用Pikafish共享库的C函数
  *
  * 这个接口映射了pikafish_c_api.h中定义的C函数：
- * - pikafish_engine_init: 初始化引擎
- * - pikafish_engine_info: 获取引擎信息
+ * - pikafish_engine_init: 初始化引擎并获取引擎信息
+ * - pikafish_evaluate_position: 评估FEN棋局位置
+ * - pikafish_is_side_in_check: 检查指定方是否被将军
+ * - pikafish_init_position: 从FEN字符串初始化棋局位置
+ * - pikafish_do_move: 应用合法移动
+ * - pikafish_generate_legal_moves: 生成所有合法移动
+ * - pikafish_evaluate: 评估当前位置
  * - pikafish_get_fen: 获取当前局面的FEN表示
+ * - pikafish_undo_move: 撤销最后一步移动
+ * - pikafish_encode_move: 将坐标表示的移动编码为内部表示
+ * - pikafish_decode_move: 将内部表示的移动解码为坐标表示
  */
 public interface PikafishLibrary extends Library {
 
 
-    /**
-     * 初始化Pikafish引擎但不启动主循环
-     *
-     * @return 0表示成功
-     */
-    int pikafish_engine_init();
 
     /**
      * 获取引擎信息字符串
      *
      * @return 指向引擎信息字符串的指针（静态内存）
      */
-    String pikafish_engine_info();
+    String pikafish_engine_init();
 
     /**
      * 评估FEN棋局位置
      *
+     * @param index 引擎实例索引
      * @param fen FEN字符串表示的棋局位置
      * @return 评估分数（以分为单位，正值表示对当前走棋方有利）
      */
-    int pikafish_evaluate_position(String fen);
+    int pikafish_evaluate_position(int index, String fen);
 
     /**
      * 从FEN字符串初始化棋局位置
      *
+     * @param index 引擎实例索引
      * @param fen FEN字符串表示的棋局位置
      * @return 0表示成功，非0表示失败
      */
-    int pikafish_init_position(String fen);
+    int pikafish_init_position(int index, String fen);
 
     /**
      * 应用合法移动
      *
+     * @param index 引擎实例索引
      * @param move 16位无符号整数表示的移动
      * @return 新位置的哈希值，0表示失败
      */
-    long pikafish_do_move(short move);
+    long pikafish_do_move(int index, short move);
 
     /**
      * 评估当前位置
      *
+     * @param index 引擎实例索引
      * @return 评估分数（以分为单位）
      */
-    int pikafish_evaluate();
+    int pikafish_evaluate(int index);
 
     /**
      * 获取当前局面的FEN表示
      *
+     * @param index 引擎实例索引
      * @return 当前局面的FEN字符串
      */
-    String pikafish_get_fen();
+    String pikafish_get_fen(int index);
 
     /**
-     * Encode a move from coordinate notation to internal representation
-     * @param move_str - move in coordinate notation (e.g., "e2e4")
-     * @return - encoded move as uint16_t, 0 if invalid
+     * 将坐标表示的移动编码为内部表示
+     * @param move_str - 坐标表示的移动 (例如 "e2e4")
+     * @return - 编码后的移动(uint16_t)，如果无效则返回0
      */
     short pikafish_encode_move(String move_str);
 
     /**
-     * Decode a move from internal representation to coordinate notation
-     * @param move - encoded move as uint16_t
-     * @return - move in coordinate notation (e.g., "e2e4"), NULL if invalid
+     * 将内部表示的移动解码为坐标表示
+     * @param move - 编码后的移动(uint16_t)
+     * @return - 坐标表示的移动 (例如 "e2e4")，如果无效则返回null
      */
     String pikafish_decode_move(short move);
     
    /**
     * Generate a list of legal moves for the current position (array version)
+    * @param index - 引擎实例索引
     * @param moves - array to store legal moves (must be at least MAX_MOVES + 1 in size)
     * @return - number of legal moves generated
     */
-   int pikafish_generate_legal_moves(short[] moves);
+   int pikafish_generate_legal_moves(int index, short[] moves);
 
    /**
     * 撤销最后一步移动
     *
+    * @param index 引擎实例索引
     * @param move 16位无符号整数表示的要撤销的移动
-    * @return 0表示成功，非0表示失败
+    * @return 新位置的哈希值，0表示失败
     */
-    long pikafish_undo_move(short move);
+   long pikafish_undo_move(int index, short move);
 
     /**
      * 检查指定方是否被将军
      *
-     * @param is_white true表示检查白方，false表示检查黑方
-     * @return true表示被将军，false表示未被将军
+     * @param index 引擎实例索引
+     * @param is_white 1表示检查白方，0表示检查黑方
+     * @return 1表示被将军，0表示未被将军
      */
-    int pikafish_is_side_in_check(int is_white);
+    int pikafish_is_side_in_check(int index, int is_white);
     
     /**
      * 工厂类用于创建PikafishLibrary实例

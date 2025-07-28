@@ -6,58 +6,54 @@ int main() {
     printf("Testing Pikafish C API\n");
 
     // Test engine info
-    const char* info = pikafish_engine_info();
-    printf("Engine Info: %s\n", info);
-
-    // Test engine initialization
-    int result = pikafish_engine_init();
-    printf("Engine initialization result: %d\n", result);
+    const char* info = pikafish_engine_init();
+    printf("Engine initialization Info: %s\n", info);
 
     printf("Comprehensive Pikafish evaluation test...\n");
     
     // Test 1: Starting position
     const char* start_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
-    int start_score = pikafish_evaluate_position(start_fen);
+    int start_score = pikafish_evaluate_position(0, start_fen);
     printf("1. Starting position: %d\n", start_score);
-    pikafish_init_position(start_fen);
-    pikafish_do_move(3492);
-    printf("1. move 3492 (extra rook)fen: %s\n", pikafish_get_fen());
-    pikafish_undo_move(3492);
-    printf("1. undo_move 3492 (extra rook)fen: %s\n", pikafish_get_fen());
+    pikafish_init_position(0, start_fen);
+    pikafish_do_move(0, 3492);
+    printf("1. move 3492 (extra rook)fen: %s\n", pikafish_get_fen(0));
+    pikafish_undo_move(0, 3492);
+    printf("1. undo_move 3492 (extra rook)fen: %s\n", pikafish_get_fen(0));
 
     
     // Test 2: Red has extra rook
     const char* red_advantage = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKAB1R w";
-    int red_score = pikafish_evaluate_position(red_advantage);
-    pikafish_init_position(red_advantage);
-    int red_score_state = pikafish_evaluate();
+    int red_score = pikafish_evaluate_position(0, red_advantage);
+    pikafish_init_position(0, red_advantage);
+    int red_score_state = pikafish_evaluate(0);
     printf("2. Red advantage (extra rook): %d, %d\n", red_score, red_score_state);
 
-    pikafish_do_move(12);
-    printf("2. move 12 (extra rook): %d\n", pikafish_evaluate());
-    printf("2. move 12 (extra rook)fen: %s\n", pikafish_get_fen());
-    pikafish_undo_move(12);
-    printf("2. undo_move 12 (extra rook): %d\n", pikafish_evaluate());
+    pikafish_do_move(0, 12);
+    printf("2. move 12 (extra rook): %d\n", pikafish_evaluate(0));
+    printf("2. move 12 (extra rook)fen: %s\n", pikafish_get_fen(0));
+    pikafish_undo_move(0, 12);
+    printf("2. undo_move 12 (extra rook): %d\n", pikafish_evaluate(0));
 
     
     // Test 3: Same position but black to move
     const char* black_advantage = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKAB1R b";
-    int black_score = pikafish_evaluate_position(black_advantage);
-    pikafish_init_position(black_advantage);
-    int black_score_state = pikafish_evaluate();
+    int black_score = pikafish_evaluate_position(0, black_advantage);
+    pikafish_init_position(0, black_advantage);
+    int black_score_state = pikafish_evaluate(0);
     printf("3. Black advantage (extra rook): %d, %d\n", black_score, black_score_state);
     
     // Test 4: Empty board (should return 0)
     const char* empty_fen = "9/9/9/9/9/9/9/9/9/9 w";
-    int empty_score = pikafish_evaluate_position(empty_fen);
+    int empty_score = pikafish_evaluate_position(0, empty_fen);
     printf("4. Empty board: %d\n", empty_score);
     
     // Test 5: Invalid FEN
-    int invalid_score = pikafish_evaluate_position("invalid");
+    int invalid_score = pikafish_evaluate_position(0, "invalid");
     printf("5. Invalid FEN: %d\n", invalid_score);
     
     // Test 6: NULL input
-    int null_score = pikafish_evaluate_position(NULL);
+    int null_score = pikafish_evaluate_position(0, NULL);
     printf("6. NULL input: %d\n", null_score);
     
     // Test 7: Move encoding and decoding
@@ -92,11 +88,11 @@ int main() {
     printf("\n8. Legal moves generation test:\n");
     
     // Initialize position
-    pikafish_init_position(start_fen);
+    pikafish_init_position(0, start_fen);
     
     // Generate legal moves
     uint16_t moves[128]; // MAX_MOVES
-    int moveCountFromArray = pikafish_generate_legal_moves(moves);
+    int moveCountFromArray = pikafish_generate_legal_moves(0, moves);
     
     // Count and display moves
     int move_count = 0;
@@ -124,11 +120,11 @@ int main() {
     // Test 11: diff side
     const char* w_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/3R5/1NBAKAB1R w - - 1 1";
     const char* b_fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/3R5/1NBAKAB1R b - - 1 1";
-    int w_score = pikafish_evaluate_position(w_fen);
-    int b_score = pikafish_evaluate_position(b_fen);
+    int w_score = pikafish_evaluate_position(0, w_fen);
+    int b_score = pikafish_evaluate_position(0, b_fen);
     printf("Test 11, same fen diff side, w:%d, b:%d \n", w_score, b_score);
-    printf("w fen: %s\n", pikafish_is_side_in_check(1) ? "in check" : "not in check");
-    printf("b fen: %s\n", pikafish_is_side_in_check(0) ? "in check" : "not in check");
+    printf("w fen: %s\n", pikafish_is_side_in_check(0, 1) ? "in check" : "not in check");
+    printf("b fen: %s\n", pikafish_is_side_in_check(0, 0) ? "in check" : "not in check");
     printf("Test completed successfully!\n");
 
     return 0;
