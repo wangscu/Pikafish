@@ -86,7 +86,7 @@ extern "C" {
         ensure_initialized();
         Color c = is_white ? WHITE : BLACK;
         Square kingSquare = engine[index].pos.king_square(c);
-        return int(engine[index].pos.checkers_to(~c, kingSquare, engine[index].pos.pieces()));
+        return engine[index].pos.checkers_to(~c, kingSquare, engine[index].pos.pieces()) != 0 ? 1 : 0;
     }
 
     // Stateful engine API
